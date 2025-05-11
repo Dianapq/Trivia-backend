@@ -13,7 +13,7 @@ try {
   }
 
   openai = new OpenAI({ apiKey });
-  console.log('✅ OpenAI configurado correctamente');
+  console.log('OpenAI configurado correctamente');
 } catch (error) {
   console.error('Error al inicializar OpenAI:', error);
 }
@@ -125,7 +125,7 @@ export const generateTrivia = async (req, res) => {
     const match = rawResponse.match(/\[\s*{[\s\S]*?}\s*\]/);
 
     if (!match) {
-      console.error('❌ No se pudo encontrar un bloque JSON en la respuesta');
+      console.error('No se pudo encontrar un bloque JSON en la respuesta');
       return res.status(500).json({
         error: 'GPT no devolvió un JSON válido',
         raw: rawResponse
@@ -136,7 +136,7 @@ export const generateTrivia = async (req, res) => {
     res.json({ trivia: parsedTrivia });
 
   } catch (error) {
-    console.error('❌ Error interno al generar trivia:', error.message);
+    console.error('Error interno al generar trivia:', error.message);
     res.status(500).json({ 
       error: 'Fallo al procesar la trivia', 
       detalle: error.message 

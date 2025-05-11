@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import sessionRoutes from './routes/session.js';
 import { router as chatRoutes } from './routes/chatRoutes.js';
 import fs from 'fs';
 import path from 'path';
@@ -21,8 +22,7 @@ if (!process.env.OPENAI_API_KEY) {
   console.log('1. Crea un archivo .env en la carpeta backend');
   console.log('2. Añade la línea: OPENAI_API_KEY=tu-api-key-de-openai');
   console.log('3. Reinicia el servidor\n');
-  
-  // Verificar si existe el archivo .env
+
   const envPath = path.join(__dirname, '.env');
   if (!fs.existsSync(envPath)) {
     console.log('\x1b[31m%s\x1b[0m', 'No se encontró el archivo .env');
@@ -40,21 +40,22 @@ app.use(express.json());
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/chat-gpt-app';
 
 mongoose.connect(MONGODB_URI)
-  .then(() => console.log('✅ MongoDB conectado'))
-  .catch(err => console.error('❌ Error de conexión a MongoDB:', err));
+  .then(() => console.log(' MongoDB conectado'))
+  .catch(err => console.error(' Error de conexión a MongoDB:', err));
 
 // Rutas
+app.use('/api/session', sessionRoutes);
 app.use('/api/chat', chatRoutes);
 
-// Ruta para probar el servidor
+// Ruta raíz
 app.get('/', (req, res) => {
-  res.json({ 
+  res.json({
     message: 'API de ChatGPT funcionando correctamente',
     status: 'OpenAI configurado con clave fija en el controlador'
   });
 });
 
-// Iniciar el servidor
+// Iniciar servidor
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+  console.log(` Servidor corriendo en el puerto ${PORT}`);
 });

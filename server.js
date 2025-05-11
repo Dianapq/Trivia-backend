@@ -15,20 +15,10 @@ const __dirname = path.dirname(__filename);
 // Cargar variables de entorno
 dotenv.config();
 
-// Verificar configuración de OpenAI
-if (!process.env.OPENAI_API_KEY) {
-  console.warn('\x1b[33m%s\x1b[0m', '⚠️  ADVERTENCIA: No se encontró la variable OPENAI_API_KEY');
-  console.log('\x1b[36m%s\x1b[0m', 'Para configurar la API key de OpenAI:');
-  console.log('1. Crea un archivo .env en la carpeta backend');
-  console.log('2. Añade la línea: OPENAI_API_KEY=tu-api-key-de-openai');
-  console.log('3. Reinicia el servidor\n');
+// Verificación clave
+console.log("🌍 URI Mongo recibida:", process.env.MONGO_URI);
 
-  const envPath = path.join(__dirname, '.env');
-  if (!fs.existsSync(envPath)) {
-    console.log('\x1b[31m%s\x1b[0m', 'No se encontró el archivo .env');
-  }
-}
-
+// Inicializar app
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -36,26 +26,39 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
+// Conexión a MongoDB Atlas
 const MONGODB_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/chat-gpt-app';
 
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log(' MongoDB conectado'))
-  .catch(err => console.error(' Error de conexión a MongoDB:', err));
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+  .then(() => console.log('✅ MongoDB conectado desde Vercel'))
+  .catch(err => console.error('❌ Error de conexión a MongoDB desde Vercel:', err.message));
+
+// Verificar configuración de OpenAI (opcional)
+if (!process.env.OPENAI_API_KEY) {
+  console.warn('⚠️  No se encontró la variable OPENAI_API_KEY');
+  const envPath = path.join(__dirname, '.env');
+  if (!fs.existsSync(envPath)) {
+    console.error('❌ No se encontró el archivo .env');
+  }
+}
 
 // Rutas
 app.use('/api/session', sessionRoutes);
 app.use('/api/chat', chatRoutes);
 
-// Ruta raíz
+// Ruta base
 app.get('/', (req, res) => {
   res.json({
-    message: 'API de ChatGPT funcionando correctamente',
-    status: 'OpenAI configurado con clave fija en el controlador'
+    message: 'API funcionando correctamente',
+    mongo: !!process.env.MONGO_URI,
+    status: 'conectado'
   });
 });
 
 // Iniciar servidor
 app.listen(PORT, () => {
-  console.log(` Servidor corriendo en el puerto ${PORT}`);
+  console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
 });

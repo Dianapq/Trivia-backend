@@ -1,13 +1,16 @@
 import express from 'express';
 import GameSession from '../models/GameSession.js';
+import { connectDB } from '../utils/connectMongo.js'; // 👈 importa el forzador
 
 const router = express.Router();
 
 router.post('/save', async (req, res) => {
-  console.log("📥 Datos recibidos en /save:", req.body);
   try {
+    await connectDB(); // 👈 conéctate antes de hacer nada
+
     const session = new GameSession(req.body);
     await session.save();
+
     res.status(201).json({ message: 'Sesión guardada correctamente' });
   } catch (err) {
     console.error("❌ Error guardando sesión:", err);
@@ -15,5 +18,5 @@ router.post('/save', async (req, res) => {
   }
 });
 
-
 export default router;
+
